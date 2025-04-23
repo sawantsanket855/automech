@@ -1,0 +1,2 @@
+C:/Users/Sanket/Desktop/AutoMech/garage/android/app/.cxx/RelWithDebInfo/6r4s1h4q/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Sanket/Desktop/AutoMech/garage/android/app/.cxx/RelWithDebInfo/6r4s1h4q/armeabi-v7a/CMakeFiles/rebuild_cache.dir

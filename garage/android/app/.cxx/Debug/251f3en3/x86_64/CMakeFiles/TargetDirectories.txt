@@ -1,0 +1,2 @@
+C:/Users/Sanket/Desktop/garage_sanket/garage/android/app/.cxx/Debug/251f3en3/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Sanket/Desktop/garage_sanket/garage/android/app/.cxx/Debug/251f3en3/x86_64/CMakeFiles/rebuild_cache.dir

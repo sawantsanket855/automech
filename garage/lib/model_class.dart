@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LoginData extends ChangeNotifier{
+  String loginType='user';
   String verificationId='';
-  String completeNumber='';
+  String completeNumber='+9665709490';
   String name='';
   String email='';
   String dOB='';
@@ -59,5 +61,22 @@ class Loader extends ChangeNotifier{
   void changeSubmitOtpLoader(value){
     getOtpLoader=value;
     ChangeNotifier();
+  }
+}
+
+class GarageProvider extends ChangeNotifier {
+  final List<Marker> _garageMarkers = [];
+
+  List<Marker> get garageMarkers => _garageMarkers;
+
+  void addGarageMarkers(String name, LatLng location) {
+    final marker = Marker(
+      markerId: MarkerId(name),
+      position: location,
+      infoWindow: InfoWindow(title: name),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    );
+    _garageMarkers.add(marker);
+    notifyListeners();
   }
 }

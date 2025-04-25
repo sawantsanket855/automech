@@ -25,6 +25,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State {
+  String loginType='user';
   String phoneNumber = '';
   String completeNumber = '';
   int activeIndex = 0;
@@ -102,7 +103,7 @@ class _LoginState extends State {
           Padding(
             padding: const EdgeInsets.only(top: 350, left: 140),
             child: Text(
-              "Login Via",
+              loginType=='user'?"User Login":"Garage Login",
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w500,
@@ -127,6 +128,7 @@ class _LoginState extends State {
             ),
           ),
           Container(
+
             margin: const EdgeInsets.only(top: 480),
             width: double.infinity,
             child: ElevatedButton(
@@ -170,72 +172,54 @@ class _LoginState extends State {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                 Expanded(
                   child: Divider(thickness: 1, color: Colors.grey),
                 ),
-                Padding(
+                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Text("OR"),
                 ),
-                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                 Expanded(child: Divider(thickness: 1, color: Colors.grey)),
               ],
             ),
           ),
-          Row(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 600, left: 20),
-                width: 150,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   Container(
+                               margin: const EdgeInsets.only(top: 600),
+                               width: MediaQuery.of(context).size.width/2,
+                               child: ElevatedButton(
+                                 style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  onPressed: () {},
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        "assets/Login/WhatsApp.png",
-                        fit: BoxFit.cover,
-                      ),
-                      Text(
-                        "WhatsApp",
-                        style: GoogleFonts.poppins(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Container(
-                margin:const EdgeInsets.only(top: 600, right: 20),
-                width: 150,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                                 ),
+                                 onPressed: () async {
+                    setState(() {
+                      if(loginType=='user'){
+                      context.read<LoginData>().
+                      loginType='garage';
+                    }else{
+                      loginType='user';
+                    }
+                    });
+                    
+                                 },
+                                 child: 
+                    Text( loginType=='user'? "Login as Partner":"Login as a User",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ),
-                  onPressed: () {},
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        "assets/Login/Telegram.png",
-                        fit: BoxFit.cover,
-                      ),
-                      Text(
-                        "Telegram",
-                        style: GoogleFonts.poppins(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          )
+                                 ),
+                               ),
+                             ),
+                 ],
+               ),
+              
         ],
       ),
     );

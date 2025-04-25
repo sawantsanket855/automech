@@ -7,10 +7,11 @@ class Navbar extends StatefulWidget {
   const Navbar({super.key});
   @override
   State createState() => _NavBarState();
+  
 }
 
 class _NavBarState extends State {
-  PersistentTabController _controller =
+  final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
 
   List<Widget> _Screens() {

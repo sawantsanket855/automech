@@ -3,12 +3,14 @@ import "dart:developer";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:garage/Screens/HomePage/garagehomepage.dart";
 import "package:garage/Screens/HomePage/userhomepage.dart";
 import "package:garage/Screens/LoginScreen/otp_screen.dart";
 import "package:garage/Screens/Profile/myprofilefirsttime.dart";
 import "package:garage/Screens/Profile/profilescreen.dart";
 import "package:provider/provider.dart";
 import "./model_class.dart";
+import 'package:firebase_storage/firebase_storage.dart';
 
 void uploadUserData(BuildContext context) async {
   Map<String, dynamic> data = {
@@ -60,8 +62,7 @@ void sendOTP(BuildContext context) async {
 
 void sumbitOTP(BuildContext context, otp) async {
   PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: context.read<LoginData>().verificationId,
-      smsCode: otp);
+      verificationId: context.read<LoginData>().verificationId, smsCode: otp);
   log(credential.verificationId.toString());
   try {
     log("otp is $otp");
@@ -75,21 +76,18 @@ void sumbitOTP(BuildContext context, otp) async {
       DocumentSnapshot doc = await docRef.get();
       if (doc.exists) {
         log('Document exists!');
-         Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const Userhomepage();
-    }));
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return const Userhomepage();
+        }));
       } else {
         log('Document does not exist.');
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const MyprofileFirstTime();
-    }));
+          return const MyprofileFirstTime();
+        }));
       }
     } catch (e) {
       log("error for doc");
     }
-
-
-    
   } catch (e) {
     log(e.toString());
     ScaffoldMessenger.of(context).showSnackBar(
@@ -101,4 +99,47 @@ void sumbitOTP(BuildContext context, otp) async {
     );
   }
   context.read<Loader>().changeSubmitOtpLoader(false);
+}
+
+void registerGarage(
+    BuildContext context, Map<String, dynamic> data, List images) async {
+      String completeNumber=context.read<LoginData>().completeNumber;
+      List imageUrl=[];
+  try {
+    final docRef =
+        FirebaseFirestore.instance.collection('Garages').doc(completeNumber);
+    DocumentSnapshot doc = await docRef.get();
+    if (doc.exists) {
+      log('Document exists!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text("Mobile number already used. Try with another number")),
+      );
+    } else {
+      log('Document does not exist.');
+      for(int i=0;i<images.length;i++){
+        UploadTask uploadtask=FirebaseStorage.instance.ref().child('GarageImages').child(completeNumber).child(completeNumber+i.toString()).putFile(images[i]);
+        TaskSnapshot taskSnapshot= await uploadtask;
+        String downloadUrl= await taskSnapshot.ref.getDownloadURL();
+        imageUrl.add(downloadUrl);
+      }
+      data['images']=imageUrl;
+
+
+
+      await FirebaseFirestore.instance
+          .collection("Garages")
+          .doc(completeNumber)
+          .set(data); //context.read<LoginData>().completeNumber
+      log('garage registerd on firebase');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Garage added Successfully!")),
+      );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const Garagehomepage()));
+    }
+  } catch (e) {
+    log("error for doc");
+  }
 }

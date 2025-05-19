@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:garage/Screens/LoginScreen/otp_screen.dart';
 import 'package:garage/firebasedataupload.dart';
 import 'package:garage/model_class.dart';
+import 'package:garage/provider_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -25,7 +26,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State {
-  String loginType='user';
   String phoneNumber = '';
   String completeNumber = '';
   int activeIndex = 0;
@@ -41,185 +41,190 @@ class _LoginState extends State {
   Widget build(BuildContext contsext) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
+      body: ListView(
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: TextButton(
-              onPressed: () {},
-              child: Container(
-                margin: const EdgeInsets.only(
-                  top: 15,
-                ),
-                child: Text(
-                  "Skip >>>",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
+          Stack(
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      top: 15,
+                    ),
+                    child: Text(
+                      "Skip >>>",
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Column(
-            children: [
-              CarouselSlider.builder(
-                itemCount: items.length,
-                options: CarouselOptions(
-                  height: 400,
-                  viewportFraction: 1,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      activeIndex = index;
-                    });
+              Column(
+                children: [
+                  CarouselSlider.builder(
+                    itemCount: items.length,
+                    options: CarouselOptions(
+                      height: 400,
+                      viewportFraction: 1,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          activeIndex = index;
+                        });
+                      },
+                    ),
+                    itemBuilder: (context, index, realIndex) {
+                      final imgList = items[index];
+                      return Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(
+                              top: 60,
+                            ),
+                            child: buildImage(imgList.path, index),
+                          ),
+                          buildText(imgList.itemName, index),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 300),
+                    child: buildIndicator(),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 350),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                       context.read<LoginData>().loginType=='user'?"User Login":"Garage Login",
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 400, left: 0),
+                child: IntlPhoneField(
+                  decoration: const InputDecoration(
+                    labelText: "Phone number",
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(),
+                    ),
+                  ),
+                  initialCountryCode: "IN",
+                  onChanged: (phone) {
+                    phoneNumber = phone.number;
+                    completeNumber = phone.completeNumber;
+                    // print(phone.completeNumber);
                   },
                 ),
-                itemBuilder: (context, index, realIndex) {
-                  final imgList = items[index];
-                  return Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(
-                          top: 60,
-                        ),
-                        child: buildImage(imgList.path, index),
-                      ),
-                      buildText(imgList.itemName, index),
-                    ],
-                  );
-                },
               ),
-            ],
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 300, left: 170),
-            child: buildIndicator(),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 350, left: 140),
-            child: Text(
-              loginType=='user'?"User Login":"Garage Login",
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 400, left: 0),
-            child: IntlPhoneField(
-              decoration: const InputDecoration(
-                labelText: "Phone number",
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(),
-                ),
-              ),
-              initialCountryCode: "IN",
-              onChanged: (phone) {
-                phoneNumber = phone.number;
-                completeNumber = phone.completeNumber;
-                // print(phone.completeNumber);
-              },
-            ),
-          ),
-          Container(
-
-            margin: const EdgeInsets.only(top: 480),
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () async {
-                if(!context.read<Loader>().getOtpLoader){
-                  if (phoneNumber.length == 10) {
-                  context.read<LoginData>().setNumber(completeNumber);
-                  context.read<Loader>().changeGetOtpLoader(true);
-                  sendOTP(context);
-                  
-                  
-                  //  Navigator.push(context,
-                  //         MaterialPageRoute(builder: (context) {
-                  //       return const Otpscreen();
-                  //     }));
-                }
-                }
-                
-              },
-              child: context.read<Loader>().getOtpLoader ? SizedBox(
-                height: 30,
-                width: 30,
-                child: Image.asset('assets/loading.gif')) :Text(
-                "GET OTP",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 550),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 Expanded(
-                  child: Divider(thickness: 1, color: Colors.grey),
-                ),
-                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text("OR"),
-                ),
-                 Expanded(child: Divider(thickness: 1, color: Colors.grey)),
-              ],
-            ),
-          ),
-               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                 children: [
-                   Container(
-                               margin: const EdgeInsets.only(top: 600),
-                               width: MediaQuery.of(context).size.width/2,
-                               child: ElevatedButton(
-                                 style: ElevatedButton.styleFrom(
+              Container(
+          
+                margin: const EdgeInsets.only(top: 480),
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                                 ),
-                                 onPressed: () async {
-                    setState(() {
-                      if(loginType=='user'){
-                      context.read<LoginData>().
-                      loginType='garage';
-                    }else{
-                      loginType='user';
+                  ),
+                  onPressed: () async {
+                    if(!context.read<Loader>().isGetOtpLoaderOn){
+                      if (phoneNumber.length == 10) {
+                      context.read<LoginData>().setNumber(completeNumber);
+                      context.read<Loader>().changeGetOtpLoader('on');
+                      
+                      sendOTP(context);
+                      
+                      
+                      //  Navigator.push(context,
+                      //         MaterialPageRoute(builder: (context) {
+                      //       return const Otpscreen();
+                      //     }));
                     }
-                    });
+                    }
                     
-                                 },
-                                 child: 
-                    Text( loginType=='user'? "Login as Partner":"Login as a User",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                  },
+                  child: context.read<Loader>().getOtpLoader ,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 550),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Expanded(
+                      child: Divider(thickness: 1, color: Colors.grey),
                     ),
+                     Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text("OR"),
+                    ),
+                     Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  ],
+                ),
+              ),
+                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       Container(
+                                   margin: const EdgeInsets.only(top: 600),
+                                   width: MediaQuery.of(context).size.width/2,
+                                   child: ElevatedButton(
+                                     style: ElevatedButton.styleFrom(
+                        backgroundColor:context.read<LoginData>().loginType=='user'? const Color.fromARGB(255, 13, 102, 175) : Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                                     ),
+                                     onPressed: () async {
+                        setState(() {
+                          if(context.read<LoginData>().loginType=='user'){
+                          context.read<LoginData>().setLoginType('garage');
+                          
+                        }else{
+                          context.read<LoginData>().setLoginType('user');
+                        }
+                        });
+                        
+                                     },
+                                     child: 
+                        Text( context.read<LoginData>().loginType=='user'? "Login as Partner":"Login as a User",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                                     ),
+                                   ),
                                  ),
-                               ),
-                             ),
-                 ],
-               ),
-              
+                     ],
+                   ),
+                  
+            ],
+          ),
         ],
       ),
     );

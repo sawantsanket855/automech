@@ -6,7 +6,9 @@ import 'package:garage/Screens/CarCompany/carCompany.dart';
 import 'package:garage/Screens/CarCompany/fuelType.dart';
 import 'package:garage/Screens/CarCompany/manualEntry.dart';
 import 'package:garage/Screens/HomePage/garagehomepage.dart';
+import 'package:garage/Screens/HomePage/userhomepage.dart';
 import 'package:garage/Screens/Inventory/acPage.dart';
+import 'package:garage/Screens/Inventory/add_item.dart';
 import 'package:garage/Screens/Inventory/batteryPage.dart';
 import 'package:garage/Screens/Inventory/brakePage.dart';
 import 'package:garage/Screens/Inventory/clutchPage.dart';
@@ -27,22 +29,26 @@ import 'package:garage/Screens/CarCompany/modelSelection.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:garage/model_class.dart';
+import 'package:garage/navBar.dart';
+import 'package:garage/provider_class.dart';
+import 'package:garage/shared_preferences_function.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void main() async{
  WidgetsFlutterBinding.ensureInitialized();
  await Firebase.initializeApp(options:const FirebaseOptions(apiKey: "AIzaSyBJp_EviA7gE9MCsv2yuaptfgxcSKIsqKE", appId: "1:800570586689:android:4ff34861306367c4f9f8c0", messagingSenderId: "800570586689", projectId: "automech-ca3b2"));
- 
-  runApp(const MainApp());
+ bool isPreviousLogin= await isAccountLogined();
+  runApp(MainApp(isPreviousLogin));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final bool isPreviousLogin;
+  MainApp(this.isPreviousLogin,{super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -61,8 +67,15 @@ class MainApp extends StatelessWidget {
       child:const MaterialApp(
       debugShowCheckedModeBanner: false,
       
-      home: Login(),
-      // home:SplashScreen(),
+      // home:isPreviousLogin ?const Userhomepage() :const Login() ,
+
+
+
+
+
+      // home: SplashScreen(),
+      // home: AddItem(),
+      home:Navbar(),
     )
       );
   }

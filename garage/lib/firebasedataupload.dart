@@ -8,11 +8,15 @@ import "package:garage/Screens/HomePage/userhomepage.dart";
 import "package:garage/Screens/LoginScreen/otp_screen.dart";
 import "package:garage/Screens/Profile/myprofilefirsttime.dart";
 import "package:garage/Screens/Profile/profilescreen.dart";
+import "package:garage/Screens/Profile/register_partner.dart";
+import "package:garage/provider_class.dart";
+import "package:garage/shared_preferences_function.dart";
 import "package:provider/provider.dart";
 import "./model_class.dart";
 import 'package:firebase_storage/firebase_storage.dart';
 
 void uploadUserData(BuildContext context) async {
+
   Map<String, dynamic> data = {
     "name": context.read<LoginData>().name,
     "email": context.read<LoginData>().email,
@@ -28,6 +32,7 @@ void uploadUserData(BuildContext context) async {
       .collection("Users")
       .doc(context.read<LoginData>().completeNumber)
       .set(data);
+
 }
 
 void sendOTP(BuildContext context) async {
@@ -35,6 +40,7 @@ void sendOTP(BuildContext context) async {
     phoneNumber: context.read<LoginData>().completeNumber,
     verificationCompleted: (PhoneAuthCredential credential) async {
       await FirebaseAuth.instance.signInWithCredential(credential);
+      context.read<Loader>().changeGetOtpLoader('off');
     },
     verificationFailed: (FirebaseAuthException e) {
       log("error:");
@@ -46,18 +52,22 @@ void sendOTP(BuildContext context) async {
           duration: const Duration(seconds: 3),
         ),
       );
+      context.read<Loader>().changeGetOtpLoader('off');
     },
     codeSent: (String verificationId, int? forceResendingToken) {
       context.read<LoginData>().setVerificationId(verificationId);
       log(context.read<LoginData>().verificationId);
       log("otp sent");
+      context.read<Loader>().changeGetOtpLoader('off');
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return const Otpscreen();
       }));
     },
-    codeAutoRetrievalTimeout: (String verificationId) {},
+    codeAutoRetrievalTimeout: (String verificationId) {
+      context.read<Loader>().changeGetOtpLoader('off');
+    },
   );
-  context.read<Loader>().changeGetOtpLoader(false);
+  
 }
 
 void sumbitOTP(BuildContext context, otp) async {
@@ -71,13 +81,15 @@ void sumbitOTP(BuildContext context, otp) async {
     log("signin successfully");
 
     final docRef =
-        FirebaseFirestore.instance.collection('Users').doc('+919665709491');
+        FirebaseFirestore.instance.collection(context.read<LoginData>().loginType=='user'?'Users':'Garage').doc('+919665709491');
     try {
       DocumentSnapshot doc = await docRef.get();
-      if (doc.exists) {
+      if(context.read<LoginData>().loginType=='user'){
+          if (doc.exists) {
         log('Document exists!');
+        setLoginPreferences(context);                                     //shared preference for login
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const Userhomepage();
+          return const HomeScreen();
         }));
       } else {
         log('Document does not exist.');
@@ -85,6 +97,21 @@ void sumbitOTP(BuildContext context, otp) async {
           return const MyprofileFirstTime();
         }));
       }
+        }else{
+          if (doc.exists) {
+        log('Document exists!');
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          setLoginPreferences(context);                                     //shared preference for login
+          return const Garagehomepage();
+        }));
+      } else {
+        log('Document does not exist.');
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return const RegisterPartner();
+        }));
+      }
+        }
+      
     } catch (e) {
       log("error for doc");
     }
@@ -135,11 +162,33 @@ void registerGarage(
       log('garage registerd on firebase');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Garage added Successfully!")),
+        
       );
+      setLoginPreferences(context);                                     //shared preference for login
+      
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const Garagehomepage()));
     }
   } catch (e) {
     log("error for doc");
   }
+}
+
+
+void uploadItem(InventoryItem item) async{
+DocumentReference<Map<String, dynamic>> data= await FirebaseFirestore.instance.collection('Global_inventory').add({});
+
+//images
+UploadTask uploadtask=FirebaseStorage.instance.ref().child('Global_inventory').child(data.id).putFile(item.image!);
+        TaskSnapshot taskSnapshot= await uploadtask;
+        String downloadUrl= await taskSnapshot.ref.getDownloadURL();
+        
+        //all data
+       
+        Map<String,dynamic> itemData={'id':data.id,'name':item.name,'description':item.description,'category':item.category,'price':item.price,'image':downloadUrl};
+
+        //upload
+await FirebaseFirestore.instance.collection('Global_inventory').add(itemData);
+log("global data uploaded successfully");
+
 }

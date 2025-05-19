@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:garage/Screens/MapScreen/MapScreen.dart';
 import 'package:garage/firebasedataupload.dart';
 import 'package:garage/model_class.dart';
+import 'package:garage/provider_class.dart';
+import 'package:garage/shared_preferences_function.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +25,7 @@ class _FueltypeState extends State {
       context.read<CarInfo>().setCarFuel(selectedFuelType??"");
       log( context.read<CarInfo>().carFuelType);
       uploadUserData(context);
+      setLoginPreferences(context);                                     //shared preference for login
       Navigator.push(context, MaterialPageRoute(builder: (context){
         return const Mapscreen();
       }));

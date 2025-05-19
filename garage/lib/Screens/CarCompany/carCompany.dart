@@ -5,6 +5,7 @@ import 'package:garage/Screens/CarCompany/ManualEntry.dart';
 import 'package:garage/Screens/CarCompany/fuelType.dart';
 import 'package:garage/Screens/CarCompany/modelSelection.dart';
 import 'package:garage/model_class.dart';
+import 'package:garage/provider_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 

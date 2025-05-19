@@ -8,6 +8,7 @@ import 'package:garage/Screens/Profile/myprofilefirsttime.dart';
 import 'package:garage/Screens/Profile/profilescreen.dart';
 import 'package:garage/firebasedataupload.dart';
 import 'package:garage/model_class.dart';
+import 'package:garage/provider_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:provider/provider.dart';
@@ -268,7 +269,6 @@ class _OtpscreenState extends State {
                 if(number1.text.isNotEmpty && number2.text.isNotEmpty && number3.text.isNotEmpty && number4.text.isNotEmpty && number5.text.isNotEmpty && number6.text.isNotEmpty ){
                   String otp=number1.text+number2.text+number3.text+number4.text+number5.text+number6.text;
                   log(otp);
-                  context.read<Loader>().changeGetOtpLoader(true);
                   sumbitOTP(context,otp);
                   // Navigator.push(context,
                   //         MaterialPageRoute(builder: (context) {

@@ -6,6 +6,7 @@ import 'package:garage/Screens/HomePage/userhomepage.dart';
 import 'package:garage/firebasedataupload.dart';
 import 'package:garage/model_class.dart';
 import 'package:garage/Screens/MapScreen/MapScreen.dart';
+import 'package:garage/navBar.dart';
 import 'package:garage/provider_class.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
@@ -159,13 +160,8 @@ class _RegisterPartnerState extends State {
                               .addGarage(_nameController.text.trim(),
                                   _selectedLocation!, _images);
                           
-                          Map<String,dynamic> garageData={'name':_nameController.text,'email':_emailController.text,'contact1':_contactNumber1Controller.text,'contact2':_contactNumber2Controller.text,'address':_addressController.text};
-                          registerGarage(context,garageData,_images);
-
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>const HomeScreen()));
+                          Map<String,dynamic> garageData={'name':_nameController.text,'email':_emailController.text,'contact1':_contactNumber1Controller.text,'contact2':_contactNumber2Controller.text,'address':_addressController.text ,'lat':_selectedLocation!.latitude,'lng':_selectedLocation!.longitude};
+                          registerGarage(context,garageData,_images,);
                     
                         }
                       },

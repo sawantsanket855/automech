@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:garage/model_class.dart';
 import 'package:garage/provider_class.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,33 +13,59 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State {
-  @override
-  Widget build(BuildContext context) {
-    final garageProvider = Provider.of<GarageProvider>(context);
-    final garages = garageProvider.garages;
+  var data1;
 
-    return Scaffold(
+  bool _isLoading = true;
+
+    @override
+  void initState() {
+    super.initState();
+    getGarages();
+  }
+
+
+  Future<void> getGarages()async{
+    try{
+      var data=await FirebaseFirestore.instance.collection('Garages').get();
+      data1=data.docs;
+      print(data1);
+    }catch(e){
+      log("error while retrieving data");
+    }finally{
+     setState(() {
+        _isLoading = false;
+      });
+      log("no loading");
+    }
+    
+    log("data display");
+    
+  }
+
+  @override
+
+  Widget build(BuildContext context) {
+
+
+    return _isLoading? const Text("Loading"): 
+    Scaffold(
       appBar: AppBar(
-        title: Text("Garages"),
+        // title: Text("Garages"),
+        title:const Text('Garages'),
+
       ),
       body: ListView.builder(
-        itemCount: garages.length,
+        itemCount: data1.length,
         itemBuilder: (context, index) {
-          final garage = garages[index];
           return Card(
-            margin: EdgeInsets.all(10),
+            margin:const EdgeInsets.all(10),
             child: ListTile(
               onTap: () {},
-              title: Text(garage.name),
-              subtitle: Text(
-                  'Lat: ${garage.location.latitude}, Lng: ${garage.location.longitude}'),
-              leading: garage.images.isNotEmpty
-                  ? Image.file(
-                      garage.images[0],
-                      width: 60,
-                      fit: BoxFit.cover,
-                    )
-                  : Icon(Icons.garage),
+              title: Text(data1[index]["name"]),
+              subtitle: Text(data1[index]["address"]),
+              leading: data1[index].data().containsKey('images')
+                  ? Image.network(data1[index]["images"][0])
+                  :const Icon(Icons.garage),
             ),
           );
         },

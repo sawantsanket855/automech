@@ -55,3 +55,18 @@ class Garage {
         inventoryItems: List<String>.from(map["inventoryItems"] ?? []));
   }
 }
+
+
+
+class FetchedGarages{
+   final String name;
+  final String location;
+  final List images;
+  final List inventoryItems;
+
+  FetchedGarages(
+      {required this.name,
+      required this.location,
+      required this.images,
+      required this.inventoryItems});
+}

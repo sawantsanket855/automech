@@ -64,18 +64,19 @@ class MainApp extends StatelessWidget {
           create:(context)=>GarageProvider(),
           ),
       ],
-      child:const MaterialApp(
+      child: MaterialApp(
       debugShowCheckedModeBanner: false,
       
-      // home:isPreviousLogin ?const Userhomepage() :const Login() ,
+      home:isPreviousLogin ?const Navbar() :const Login() ,
 
 
 
 
 
       // home: SplashScreen(),
-      // home: AddItem(),
-      home:Navbar(),
+      // home:HomeScreen(),
+      // home:Navbar(),
+      // home:AddItem(),
     )
       );
   }

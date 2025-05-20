@@ -9,8 +9,10 @@ import "package:garage/Screens/LoginScreen/otp_screen.dart";
 import "package:garage/Screens/Profile/myprofilefirsttime.dart";
 import "package:garage/Screens/Profile/profilescreen.dart";
 import "package:garage/Screens/Profile/register_partner.dart";
+import "package:garage/navBar.dart";
 import "package:garage/provider_class.dart";
 import "package:garage/shared_preferences_function.dart";
+import "package:google_maps_flutter/google_maps_flutter.dart";
 import "package:provider/provider.dart";
 import "./model_class.dart";
 import 'package:firebase_storage/firebase_storage.dart';
@@ -129,7 +131,7 @@ void sumbitOTP(BuildContext context, otp) async {
 }
 
 void registerGarage(
-    BuildContext context, Map<String, dynamic> data, List images) async {
+    BuildContext context, Map<String, dynamic> data, List images ) async {
       String completeNumber=context.read<LoginData>().completeNumber;
       List imageUrl=[];
   try {
@@ -166,16 +168,20 @@ void registerGarage(
       );
       setLoginPreferences(context);                                     //shared preference for login
       
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const Garagehomepage()));
+      // Navigator.pushAndRemoveUntil(context,
+      //     MaterialPageRoute(builder: (context) =>const Navbar()),(Route<dynamic> route) => false,);
+
+      Navigator.of(context).pop();
     }
+
+
   } catch (e) {
     log("error for doc");
   }
 }
 
 
-void uploadItem(InventoryItem item) async{
+void uploadItemGlobal(InventoryItem item) async{
 DocumentReference<Map<String, dynamic>> data= await FirebaseFirestore.instance.collection('Global_inventory').add({});
 
 //images
@@ -188,7 +194,76 @@ UploadTask uploadtask=FirebaseStorage.instance.ref().child('Global_inventory').c
         Map<String,dynamic> itemData={'id':data.id,'name':item.name,'description':item.description,'category':item.category,'price':item.price,'image':downloadUrl};
 
         //upload
-await FirebaseFirestore.instance.collection('Global_inventory').add(itemData);
+await FirebaseFirestore.instance.collection('Global_inventory').doc(data.id).set(itemData);
+log("local data uploaded successfully");
 log("global data uploaded successfully");
 
+}
+
+void uploadItemLocal(String completeNumber, InventoryItem item) async{
+
+//get previous data of local inventory
+List localInventory=[];
+DocumentSnapshot<Map<String, dynamic>> prevData =await FirebaseFirestore.instance.collection("Garages").doc(completeNumber).get();
+try{
+  localInventory=prevData['localInventory'];
+}catch(e){
+  log("error111 $e");
+}
+
+DocumentReference<Map<String, dynamic>> data= await FirebaseFirestore.instance.collection('Local_inventory').add({});
+
+//images
+UploadTask uploadtask=FirebaseStorage.instance.ref().child('Local_inventory').child(data.id).putFile(item.image!);
+        TaskSnapshot taskSnapshot= await uploadtask;
+        String downloadUrl= await taskSnapshot.ref.getDownloadURL();
+        
+        //all data
+       
+        Map<String,dynamic> itemData={'id':data.id,'name':item.name,'description':item.description,'category':item.category,'price':item.price,'image':downloadUrl};
+
+        //upload
+await FirebaseFirestore.instance.collection('Local_inventory').doc(data.id).set(itemData);
+log('1');
+localInventory.add(data.id);
+log("2");
+await FirebaseFirestore.instance.collection('Garages').doc(completeNumber).update({"localInventory":localInventory});
+log("3");
+log("local data uploaded successfully");
+
+fetchInventoryData();
+
+
+}
+void fetchInventoryData()async{
+    List localInventory=["082k8AX9BeTACz9HePQy","PgZA1ChxrqIkpj85mKwr"];
+    String completeNumber="+9665709490";
+
+
+  // List allItems=[];
+   Map <String ,List> allItems = {
+    "Battery": [],
+    "AC": [],
+    "Brake": [],
+    "Clutch": [],
+    "Tyre": [],
+  };
+  
+
+  var globalData= await FirebaseFirestore.instance.collection("Global_inventory").get();
+  var globalData1=globalData.docs;
+  for (int i=0;i<globalData1.length;i++){
+    allItems[globalData1[i]['category']]!.add(globalData1[i].data());
+  }
+  
+  for (int i=0;i<localInventory.length;i++){
+    var localData= await FirebaseFirestore.instance.collection("Local_inventory").doc(localInventory[i]).get();
+    allItems[localData['category']]!.add(localData.data());
+    // allItems.add(localData.data());
+
+  }
+
+  log("all items");
+  print(allItems);
+  
 }

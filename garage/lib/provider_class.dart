@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io';
 
+import 'package:provider/provider.dart';
+
 
 
 class LoginData extends ChangeNotifier {
@@ -119,7 +121,7 @@ class GarageProvider extends ChangeNotifier {
     );
     _garageMarkers.add(marker);
     notifyListeners();
-  }
+  } 
 
   final List<Garage> _garages = [];
 
@@ -149,7 +151,7 @@ class GarageProvider extends ChangeNotifier {
     return _globalInventory[category] ?? [];
   }
 
-  void addGlobalItem(InventoryItem item){
+  void addGlobalItem(BuildContext context, InventoryItem item){
     if (_globalInventory.containsKey(item.category)){
       _globalInventory[item.category]!.add(item);
     }
@@ -159,6 +161,6 @@ class GarageProvider extends ChangeNotifier {
     globalItemCount++;
     notifyListeners();
 
-    uploadItem(item);
+    uploadItemLocal(context.read<LoginData>().completeNumber,item);
   }
 }

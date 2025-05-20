@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:garage/Screens/Profile/myprofile.dart';
+import 'package:garage/Screens/Profile/register_partner.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -160,7 +162,10 @@ class _ProfilescreenState extends State {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Myprofile()));
+              },
               child: Row(
                 children: [
                   Image.asset("assets/Profile/Profile.png"),
@@ -234,7 +239,10 @@ class _ProfilescreenState extends State {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => RegisterPartner()));
+              },
               child: Row(
                 children: [
                   Image.asset("assets/Profile/Partner.png"),

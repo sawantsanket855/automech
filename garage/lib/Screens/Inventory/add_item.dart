@@ -48,7 +48,7 @@ class AddItemState extends State {
           image:_image
           );
 
-      Provider.of<GarageProvider>(context, listen: false).addGlobalItem(newItem);
+      Provider.of<GarageProvider>(context, listen: false).addGlobalItem(context,newItem);
       Navigator.pop(context);
     }
   }
